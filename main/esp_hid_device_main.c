@@ -544,10 +544,6 @@ void ble_store_config_init(void);
 void app_main(void)
 {
     esp_err_t ret;
-#if HID_DEV_MODE == HIDD_IDLE_MODE
-    ESP_LOGE(TAG, "Please turn on BT HID device or BLE!");
-    return;
-#endif
     ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
@@ -556,9 +552,10 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "setting hid gap, mode:%d", HID_DEV_MODE);
-    ret = esp_hid_gap_init(HID_DEV_MODE);
+    ESP_LOGI(TAG, "setting hid gap, mode:%d", HIDD_BLE_MODE);
+    ret = esp_hid_gap_init(HIDD_BLE_MODE);
     ESP_ERROR_CHECK(ret);
+
     ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_KEYBOARD, ble_hid_config.device_name);
     ESP_ERROR_CHECK(ret);
     ESP_LOGI(TAG, "setting ble device");
