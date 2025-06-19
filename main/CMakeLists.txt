@@ -1,4 +1,5 @@
-set(srcs "esp_hid_device_main.c"
+set(srcs "main.c"
+         "esp_hid_device.c"
          "esp_hid_gap.c")
 set(include_dirs ".")
 

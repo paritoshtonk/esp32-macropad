@@ -531,6 +531,7 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base, i
     }
     return;
 }
+
 void ble_hid_device_host_task(void *param)
 {
     ESP_LOGI(TAG, "BLE Host Task Started");
@@ -539,9 +540,10 @@ void ble_hid_device_host_task(void *param)
 
     nimble_port_freertos_deinit();
 }
+
 void ble_store_config_init(void);
 
-void app_main(void)
+void esp_hid_device_main(void)
 {
     esp_err_t ret;
     ret = nvs_flash_init();
@@ -558,6 +560,7 @@ void app_main(void)
 
     ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_KEYBOARD, ble_hid_config.device_name);
     ESP_ERROR_CHECK(ret);
+
     ESP_LOGI(TAG, "setting ble device");
     ESP_ERROR_CHECK(
         esp_hidd_dev_init(&ble_hid_config, ESP_HID_TRANSPORT_BLE, ble_hidd_event_callback, &s_ble_hid_param.hid_dev));
