@@ -81,7 +81,13 @@ esp_err_t esp_hid_ble_gap_adv_init(uint16_t appearance, const char *device_name)
     fields.num_uuids16 = 1;
     fields.uuids16_is_complete = 1;
 
-    /* Initialize the security configuration */
+    /* Initialize the security configuration without passkey */
+    // ble_hs_cfg.sm_io_cap = BLE_SM_IO_CAP_NO_IO;
+    // ble_hs_cfg.sm_bonding = 1;
+    // ble_hs_cfg.sm_mitm = 0;
+    // ble_hs_cfg.sm_sc = 1;
+
+    /* Initialize the security configuration with passkey*/
     ble_hs_cfg.sm_io_cap = BLE_SM_IO_CAP_DISP_ONLY;
     ble_hs_cfg.sm_bonding = 1;
     ble_hs_cfg.sm_mitm = 1;
@@ -179,12 +185,13 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         ESP_LOGI(TAG, "PASSKEY_ACTION_EVENT started");
         struct ble_sm_io pkey = {0};
         int key = 0;
+        const int keycode = 999999;
 
         if (event->passkey.params.action == BLE_SM_IOACT_DISP)
         {
             pkey.action = event->passkey.params.action;
-            pkey.passkey = 123456; // This is the passkey to be entered on peer
-            ESP_LOGI(TAG, "Enter passkey %" PRIu32 "on the peer side", pkey.passkey);
+            pkey.passkey = keycode; // This is the passkey to be entered on peer
+            ESP_LOGI(TAG, "Enter passkey %" PRIu32 " on the peer side", pkey.passkey);
             rc = ble_sm_inject_io(event->passkey.conn_handle, &pkey);
             ESP_LOGI(TAG, "ble_sm_inject_io result: %d", rc);
         }
@@ -209,9 +216,9 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         }
         else if (event->passkey.params.action == BLE_SM_IOACT_INPUT)
         {
-            ESP_LOGI(TAG, "Input not supported passing -> 123456");
+            ESP_LOGI(TAG, "Input not supported passing keycode");
             pkey.action = event->passkey.params.action;
-            pkey.passkey = 123456;
+            pkey.passkey = keycode;
             rc = ble_sm_inject_io(event->passkey.conn_handle, &pkey);
             ESP_LOGI(TAG, "ble_sm_inject_io result: %d", rc);
         }
