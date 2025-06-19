@@ -257,9 +257,9 @@ void ble_hid_demo_task_kbd(void *pvParameters)
     }
 
     vTaskDelay(5000 / portTICK_PERIOD_MS);
+    counter++;
     if (counter <= 10)
         ble_hid_demo_task_kbd(NULL);
-    counter++;
 }
 
 static esp_hid_raw_report_map_t ble_report_maps[] = {
