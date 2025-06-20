@@ -1,4 +1,5 @@
 set(srcs "main.c"
+         "util.c"
          "esp_hid_device.c"
          "esp_hid_gap.c")
 set(include_dirs ".")
