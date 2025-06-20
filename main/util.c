@@ -1,4 +1,6 @@
 #include "util.h"
+#include "esp_log.h"
+#include <string.h>
 
 void printDebugLog(char *TAG, char *message)
 {
