@@ -9,8 +9,8 @@
 
 #define NUM_BUTTONS 5
 #define TOTAL_BUTTONS 5
-#define LONG_PRESS_THRESHOLD 1000 * 1000 // 1 second in microseconds
-#define DEBOUNCE_TIME_MS 20
+#define LONG_PRESS_THRESHOLD 1000 * 500 // 0.5 second in microseconds
+#define DEBOUNCE_TIME_MS 50
 
 static const char *BUTTON_TAG = "BUTTON";
 typedef struct
