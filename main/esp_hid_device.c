@@ -32,7 +32,6 @@ static const char *TAG = "HID_DEV_DEMO";
 
 typedef struct
 {
-    TaskHandle_t task_hdl;
     esp_hidd_dev_t *hid_dev;
     uint8_t protocol_mode;
     uint8_t *buffer;
@@ -124,43 +123,124 @@ void ble_hid_demo_task_mouse(void *pvParameters)
 #define USB_HID_DOT 0x37
 
 const unsigned char keyboardReportMap[] = {
-    // 7 bytes input (modifiers, resrvd, keys*5), 1 byte output
-    0x05, 0x01, // Usage Page (Generic Desktop Ctrls)
+    // -------------------------------------------------
+    // Keyboard (Report ID 1)
+    0x05, 0x01, // Usage Page (Generic Desktop)
     0x09, 0x06, // Usage (Keyboard)
     0xA1, 0x01, // Collection (Application)
     0x85, 0x01, //   Report ID (1)
-    0x05, 0x07, //   Usage Page (Kbrd/Keypad)
-    0x19, 0xE0, //   Usage Minimum (0xE0)
-    0x29, 0xE7, //   Usage Maximum (0xE7)
+    0x05, 0x07, //   Usage Page (Keyboard/Keypad)
+    0x19, 0xE0, //   Usage Minimum (224)
+    0x29, 0xE7, //   Usage Maximum (231)
     0x15, 0x00, //   Logical Minimum (0)
     0x25, 0x01, //   Logical Maximum (1)
     0x75, 0x01, //   Report Size (1)
     0x95, 0x08, //   Report Count (8)
-    0x81, 0x02, //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-    0x95, 0x01, //   Report Count (1)
-    0x75, 0x08, //   Report Size (8)
-    0x81, 0x03, //   Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-    0x95, 0x05, //   Report Count (5)
-    0x75, 0x01, //   Report Size (1)
-    0x05, 0x08, //   Usage Page (LEDs)
-    0x19, 0x01, //   Usage Minimum (Num Lock)
-    0x29, 0x05, //   Usage Maximum (Kana)
-    0x91, 0x02, //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
-    0x95, 0x01, //   Report Count (1)
-    0x75, 0x03, //   Report Size (3)
-    0x91, 0x03, //   Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
-    0x95, 0x05, //   Report Count (5)
-    0x75, 0x08, //   Report Size (8)
-    0x15, 0x00, //   Logical Minimum (0)
-    0x25, 0x65, //   Logical Maximum (101)
-    0x05, 0x07, //   Usage Page (Kbrd/Keypad)
-    0x19, 0x00, //   Usage Minimum (0x00)
-    0x29, 0x65, //   Usage Maximum (0x65)
-    0x81, 0x00, //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x81, 0x02, //   Input (Data, Variable, Absolute) ; Modifiers
+    0x75, 0x08,
+    0x95, 0x01,
+    0x81, 0x01, //   Input (Constant) ; Reserved
+    0x75, 0x08,
+    0x95, 0x06,
+    0x15, 0x00,
+    0x25, 0x65,
+    0x05, 0x07,
+    0x19, 0x00,
+    0x29, 0x65,
+    0x81, 0x00, //   Input (Data, Array) ; Keycodes
     0xC0,       // End Collection
 
-    // 65 bytes
-};
+    // -------------------------------------------------
+    // Extended Mouse (Report ID 2)
+    0x05, 0x01, // Usage Page (Generic Desktop)
+    0x09, 0x02, // Usage (Mouse)
+    0xA1, 0x01, // Collection (Application)
+    0x85, 0x02, //   Report ID (2)
+    0x09, 0x01, //   Usage (Pointer)
+    0xA1, 0x00, //   Collection (Physical)
+    0x05, 0x09, //     Usage Page (Button)
+    0x19, 0x01, //     Usage Minimum (Button 1)
+    0x29, 0x05, //     Usage Maximum (Button 5)
+    0x15, 0x00,
+    0x25, 0x01,
+    0x95, 0x05,
+    0x75, 0x01,
+    0x81, 0x02, //     Input (Data, Variable, Absolute) ; Buttons
+    0x95, 0x01,
+    0x75, 0x03,
+    0x81, 0x01, //     Input (Constant) ; Padding
+    0x05, 0x01,
+    0x09, 0x30, //     Usage (X)
+    0x09, 0x31, //     Usage (Y)
+    0x09, 0x38, //     Usage (Wheel)
+    0x0C, 0x38, //     Usage (AC Pan) ; Horizontal scroll (using Consumer Page)
+    0x15, 0x81,
+    0x25, 0x7F,
+    0x75, 0x08,
+    0x95, 0x04,
+    0x81, 0x06, //     Input (Data, Variable, Relative)
+    0xC0,       //   End Collection
+    0xC0,       // End Collection
+
+    // -------------------------------------------------
+    // Media Control (Report ID 3) — as provided
+    0x05, 0x0C, // Usage Page (Consumer)
+    0x09, 0x01, // Usage (Consumer Control)
+    0xA1, 0x01, // Collection (Application)
+    0x85, 0x03, //   Report ID (3)
+    0x09, 0x02, //   Usage (Numeric Key Pad)
+    0xA1, 0x02, //   Collection (Logical)
+    0x05, 0x09,
+    0x19, 0x01,
+    0x29, 0x0A,
+    0x15, 0x01,
+    0x25, 0x0A,
+    0x75, 0x04,
+    0x95, 0x01,
+    0x81, 0x00,
+    0xC0,
+    0x05, 0x0C,
+    0x09, 0x86,
+    0x15, 0xFF,
+    0x25, 0x01,
+    0x75, 0x02,
+    0x95, 0x01,
+    0x81, 0x46,
+    0x09, 0xE9,
+    0x09, 0xEA,
+    0x15, 0x00,
+    0x75, 0x01,
+    0x95, 0x02,
+    0x81, 0x02,
+    0x09, 0xE2,
+    0x09, 0x30,
+    0x09, 0x83,
+    0x09, 0x81,
+    0x09, 0xB0,
+    0x09, 0xB1,
+    0x09, 0xB2,
+    0x09, 0xB3,
+    0x09, 0xB4,
+    0x09, 0xB5,
+    0x09, 0xB6,
+    0x09, 0xB7,
+    0x15, 0x01,
+    0x25, 0x0C,
+    0x75, 0x04,
+    0x95, 0x01,
+    0x81, 0x00,
+    0x09, 0x80,
+    0xA1, 0x02,
+    0x05, 0x09,
+    0x19, 0x01,
+    0x29, 0x03,
+    0x15, 0x01,
+    0x25, 0x03,
+    0x75, 0x02,
+    0x81, 0x00,
+    0xC0,
+    0x81, 0x03,
+    0xC0};
 
 static void char_to_code(uint8_t *buffer, char ch)
 {
@@ -234,12 +314,21 @@ void send_keyboard(char c)
 {
     static uint8_t buffer[8] = {0};
     char_to_code(buffer, c);
-    printf("s_ble_hid_param %d\n", s_ble_hid_param.hid_dev == NULL);
     esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer, 8);
     /* send the keyrelease event with sufficient delay */
-    vTaskDelay(50 / portTICK_PERIOD_MS);
+    vTaskDelay(20 / portTICK_PERIOD_MS);
     memset(buffer, 0, sizeof(uint8_t) * 8);
     esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer, 8);
+}
+
+void type_string(const char *text)
+{
+    while (*text)
+    {
+        send_keyboard(*text);
+        vTaskDelay(50 / portTICK_PERIOD_MS); // Delay between characters
+        text++;
+    }
 }
 
 void ble_hid_demo_task_kbd(void *pvParameters)
@@ -446,24 +535,21 @@ void esp_hidd_send_consumer_value(uint8_t key_cmd, bool key_pressed)
     return;
 }
 
+void send_consumer_value(uint8_t key_cmd)
+{
+    esp_hidd_send_consumer_value(key_cmd, true);
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+    esp_hidd_send_consumer_value(key_cmd, false);
+}
+
 void ble_hid_task_start_up(void)
 {
-    if (s_ble_hid_param.task_hdl)
-    {
-        // Task already exists
-        return;
-    }
-    xTaskCreate(ble_hid_demo_task_kbd, "ble_hid_demo_task_kbd", 3 * 1024, NULL, configMAX_PRIORITIES - 3,
-                &s_ble_hid_param.task_hdl);
+    canSendHIDInput = true;
 }
 
 void ble_hid_task_shut_down(void)
 {
-    if (s_ble_hid_param.task_hdl)
-    {
-        vTaskDelete(s_ble_hid_param.task_hdl);
-        s_ble_hid_param.task_hdl = NULL;
-    }
+    canSendHIDInput = false;
 }
 
 static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base, int32_t id, void *event_data)
@@ -483,6 +569,7 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base, i
     case ESP_HIDD_CONNECT_EVENT:
     {
         ESP_LOGI(TAG, "CONNECT");
+        isDeviceConnected = true;
         break;
     }
     case ESP_HIDD_PROTOCOL_MODE_EVENT:
@@ -495,12 +582,10 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base, i
         ESP_LOGI(TAG, "CONTROL[%u]: %sSUSPEND", param->control.map_index, param->control.control ? "EXIT_" : "");
         if (param->control.control)
         {
-            // exit suspend
             ble_hid_task_start_up();
         }
         else
         {
-            // suspend
             ble_hid_task_shut_down();
         }
         break;
@@ -519,6 +604,7 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base, i
     }
     case ESP_HIDD_DISCONNECT_EVENT:
     {
+        isDeviceConnected = false;
         ESP_LOGI(TAG, "DISCONNECT: %s", esp_hid_disconnect_reason_str(esp_hidd_dev_transport_get(param->disconnect.dev), param->disconnect.reason));
         ble_hid_task_shut_down();
         esp_hid_ble_gap_adv_start();
@@ -552,12 +638,22 @@ void button_event_handler_task(void *arg)
     {
         if (xQueueReceive(button_queue, &evt, portMAX_DELAY))
         {
+            UBaseType_t count = uxQueueMessagesWaiting(button_queue);
+            ESP_LOGI("QUEUE", "Items in queue: %u , event lpressed: %d on %c", count, evt.long_press, evt.id_char);
+            if (!isDeviceConnected)
+            {
+                continue;
+            }
             if (evt.long_press)
             {
+                type_string("long_press");
+                send_consumer_value(HID_CONSUMER_VOLUME_DOWN);
                 ESP_LOGI(TAG, "Long press on '%c'", evt.id_char);
             }
             else
             {
+                type_string("short_press");
+                send_consumer_value(HID_CONSUMER_VOLUME_UP);
                 ESP_LOGI(TAG, "Short press on '%c'", evt.id_char);
             }
         }
