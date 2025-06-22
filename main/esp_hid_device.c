@@ -25,6 +25,7 @@
 
 #include "esp_hidd.h"
 #include "esp_hid_gap.h"
+#include "store/config/ble_store_config.h"
 
 static const char *TAG = "HID_DEV_DEMO";
 
@@ -232,6 +233,7 @@ void send_keyboard(char c)
 {
     static uint8_t buffer[8] = {0};
     char_to_code(buffer, c);
+    printf("s_ble_hid_param %d\n", s_ble_hid_param.hid_dev == NULL);
     esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer, 8);
     /* send the keyrelease event with sufficient delay */
     vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -258,6 +260,7 @@ void ble_hid_demo_task_kbd(void *pvParameters)
 
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     counter++;
+    printf("counter %d\n", counter);
     if (counter <= 10)
         ble_hid_demo_task_kbd(NULL);
 }
@@ -449,7 +452,6 @@ void ble_hid_task_start_up(void)
         // Task already exists
         return;
     }
-    /* Nimble Specific */
     xTaskCreate(ble_hid_demo_task_kbd, "ble_hid_demo_task_kbd", 3 * 1024, NULL, configMAX_PRIORITIES - 3,
                 &s_ble_hid_param.task_hdl);
 }

@@ -11,6 +11,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "util.h"
 
 #include "esp_hid_gap.h"
 
@@ -107,28 +108,34 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
     switch (event->type)
     {
     case BLE_GAP_EVENT_CONNECT:
+        printDebugLog("", "BLE_GAP_EVENT_CONNECT");
         /* A new connection was established or a connection attempt failed. */
         ESP_LOGI(TAG, "connection %s; status=%d",
                  event->connect.status == 0 ? "established" : "failed",
                  event->connect.status);
+
         return 0;
         break;
     case BLE_GAP_EVENT_DISCONNECT:
+        printDebugLog("", "BLE_GAP_EVENT_DISCONNECT");
         ESP_LOGI(TAG, "disconnect; reason=%d", event->disconnect.reason);
 
         return 0;
     case BLE_GAP_EVENT_CONN_UPDATE:
+        printDebugLog("", "BLE_GAP_EVENT_CONN_UPDATE");
         /* The central has updated the connection parameters. */
         ESP_LOGI(TAG, "connection updated; status=%d",
                  event->conn_update.status);
         return 0;
 
     case BLE_GAP_EVENT_ADV_COMPLETE:
+        printDebugLog("", "BLE_GAP_EVENT_ADV_COMPLETE");
         ESP_LOGI(TAG, "advertise complete; reason=%d",
                  event->adv_complete.reason);
         return 0;
 
     case BLE_GAP_EVENT_SUBSCRIBE:
+        printDebugLog("", "BLE_GAP_EVENT_SUBSCRIBE");
         ESP_LOGI(TAG, "subscribe event; conn_handle=%d attr_handle=%d "
                       "reason=%d prevn=%d curn=%d previ=%d curi=%d\n",
                  event->subscribe.conn_handle,
@@ -141,6 +148,7 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         return 0;
 
     case BLE_GAP_EVENT_MTU:
+        printDebugLog("", "BLE_GAP_EVENT_MTU");
         ESP_LOGI(TAG, "mtu update event; conn_handle=%d cid=%d mtu=%d",
                  event->mtu.conn_handle,
                  event->mtu.channel_id,
@@ -148,15 +156,20 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         return 0;
 
     case BLE_GAP_EVENT_ENC_CHANGE:
+        printDebugLog("", "BLE_GAP_EVENT_ENC_CHANGE");
         /* Encryption has been enabled or disabled for this connection. */
         MODLOG_DFLT(INFO, "encryption change event; status=%d ",
                     event->enc_change.status);
+        ESP_LOGI(TAG, "ENC_CHANGE: encrypted=%d bonded=%d",
+                 desc.sec_state.encrypted,
+                 desc.sec_state.bonded);
         rc = ble_gap_conn_find(event->enc_change.conn_handle, &desc);
         assert(rc == 0);
         ble_hid_task_start_up();
         return 0;
 
     case BLE_GAP_EVENT_NOTIFY_TX:
+        printDebugLog("", "BLE_GAP_EVENT_NOTIFY_TX");
         MODLOG_DFLT(INFO, "notify_tx event; conn_handle=%d attr_handle=%d "
                           "status=%d is_indication=%d",
                     event->notify_tx.conn_handle,
@@ -166,6 +179,7 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         return 0;
 
     case BLE_GAP_EVENT_REPEAT_PAIRING:
+        printDebugLog("", "BLE_GAP_EVENT_REPEAT_PAIRING");
         /* We already have a bond with the peer, but it is attempting to
          * establish a new secure link.  This app sacrifices security for
          * convenience: just throw away the old bond and accept the new link.
@@ -182,6 +196,7 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         return BLE_GAP_REPEAT_PAIRING_RETRY;
 
     case BLE_GAP_EVENT_PASSKEY_ACTION:
+        printDebugLog("", "BLE_GAP_EVENT_PASSKEY_ACTION");
         ESP_LOGI(TAG, "PASSKEY_ACTION_EVENT started");
         struct ble_sm_io pkey = {0};
         int key = 0;
