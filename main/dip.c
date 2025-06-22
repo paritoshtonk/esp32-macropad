@@ -30,8 +30,6 @@ void dip_main(void)
         dip_state |= (!level) << i; // Invert: ON=0 becomes 1
     }
 
-    ESP_LOGI(DIP_TAG, "DIP state at startup: 0x%X (binary: %04b)", dip_state, dip_state);
-
     // 3. Use the state for conditional behavior
     if (dip_state == 0b0001)
     {
