@@ -191,9 +191,10 @@ nimble_hid_gap_event(struct ble_gap_event *event, void *arg)
         ble_store_util_delete_peer(&desc.peer_id_addr);
 
         /* Return BLE_GAP_REPEAT_PAIRING_RETRY to indicate that the host should
-         * continue with the pairing operation.
+         * ignore with the pairing operation.
          */
-        return BLE_GAP_REPEAT_PAIRING_RETRY;
+
+        return BLE_GAP_REPEAT_PAIRING_IGNORE;
 
     case BLE_GAP_EVENT_PASSKEY_ACTION:
         printDebugLog("", "BLE_GAP_EVENT_PASSKEY_ACTION");
