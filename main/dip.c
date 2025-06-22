@@ -2,7 +2,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 
-#define TAG "DIP_STARTUP"
+#define DIP_TAG "DIP_STARTUP"
 
 #define NUM_SWITCHES 4
 const gpio_num_t dip_gpio[NUM_SWITCHES] = {GPIO_NUM_9, GPIO_NUM_8, GPIO_NUM_7, GPIO_NUM_44};
@@ -26,24 +26,24 @@ void dip_main(void)
     for (int i = 0; i < NUM_SWITCHES; i++)
     {
         int level = gpio_get_level(dip_gpio[i]);
-        ESP_LOGI(TAG, "DIP state at startup: %d", level);
+        ESP_LOGI(DIP_TAG, "DIP state at startup: %d", level);
         dip_state |= (!level) << i; // Invert: ON=0 becomes 1
     }
 
-    ESP_LOGI(TAG, "DIP state at startup: 0x%X (binary: %04b)", dip_state, dip_state);
+    ESP_LOGI(DIP_TAG, "DIP state at startup: 0x%X (binary: %04b)", dip_state, dip_state);
 
     // 3. Use the state for conditional behavior
     if (dip_state == 0b0001)
     {
-        ESP_LOGI(TAG, "Mode: TEST MODE");
+        ESP_LOGI(DIP_TAG, "Mode: TEST MODE");
     }
     else if (dip_state == 0b0010)
     {
-        ESP_LOGI(TAG, "Mode: DEBUG MODE");
+        ESP_LOGI(DIP_TAG, "Mode: DEBUG MODE");
     }
     else
     {
-        ESP_LOGI(TAG, "Mode: NORMAL MODE");
+        ESP_LOGI(DIP_TAG, "Mode: NORMAL MODE");
     }
 
     // Continue with app logic...

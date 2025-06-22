@@ -11,7 +11,7 @@
 #define LONG_PRESS_THRESHOLD 1000 * 1000 // 1 second in microseconds
 #define DEBOUNCE_TIME_MS 20
 
-static const char *TAG = "BUTTON";
+static const char *BUTTON_TAG = "BUTTON";
 typedef struct
 {
     gpio_num_t gpio;
@@ -95,11 +95,11 @@ void button_event_handler_task(void *arg)
         {
             if (evt.long_press)
             {
-                ESP_LOGI(TAG, "Long press on '%c'", evt.id_char);
+                ESP_LOGI(BUTTON_TAG, "Long press on '%c'", evt.id_char);
             }
             else
             {
-                ESP_LOGI(TAG, "Short press on '%c'", evt.id_char);
+                ESP_LOGI(BUTTON_TAG, "Short press on '%c'", evt.id_char);
             }
         }
     }
@@ -135,5 +135,5 @@ void button_main(void)
         gpio_isr_handler_add(buttons[i].gpio, button_isr_handler, (void *)(int)buttons[i].gpio);
     }
 
-    ESP_LOGI(TAG, " Buttons with queue initialized");
+    ESP_LOGI(BUTTON_TAG, " Buttons with queue initialized");
 }
