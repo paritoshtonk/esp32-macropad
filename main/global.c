@@ -2,7 +2,7 @@
 
 QueueHandle_t button_queue;
 bool isDeviceConnected = false;
-bool isHIDTaskStarted = false;
+bool canSendHIDInput = false;
 
 void init_queue()
 {

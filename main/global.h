@@ -15,7 +15,7 @@ typedef struct
 extern QueueHandle_t button_queue;
 
 extern bool isDeviceConnected;
-extern bool isHIDTaskStarted;
+extern bool canSendHIDInput;
 
 void init_queue();
 
