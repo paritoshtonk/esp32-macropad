@@ -2,6 +2,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "global.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
 #include "esp_log.h"
@@ -20,18 +21,11 @@ typedef struct
     TaskHandle_t task_handle;
 } button_t;
 
-typedef struct
-{
-    char id_char;
-    bool long_press;
-} button_event_t;
-
 // === CONFIGURATION ===
 const gpio_num_t gpio_pins[TOTAL_BUTTONS] = {GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_4, GPIO_NUM_5};
 const char button_chars[TOTAL_BUTTONS] = {'u', 'r', 'd', 'l', 'c'};
 
 button_t buttons[NUM_BUTTONS];
-static QueueHandle_t button_queue;
 
 // === ISR: Notify on both edges ===
 static void IRAM_ATTR button_isr_handler(void *arg)
@@ -85,32 +79,8 @@ void button_task(void *arg)
     }
 }
 
-// === Consumer task ===
-void button_event_handler_task(void *arg)
-{
-    button_event_t evt;
-    while (1)
-    {
-        if (xQueueReceive(button_queue, &evt, portMAX_DELAY))
-        {
-            if (evt.long_press)
-            {
-                ESP_LOGI(BUTTON_TAG, "Long press on '%c'", evt.id_char);
-            }
-            else
-            {
-                ESP_LOGI(BUTTON_TAG, "Short press on '%c'", evt.id_char);
-            }
-        }
-    }
-}
-
 void button_main(void)
 {
-    // Create queue
-    button_queue = xQueueCreate(5, sizeof(button_event_t));
-
-    xTaskCreate(button_event_handler_task, "button_evt_handler", 2048, NULL, 10, NULL);
     gpio_install_isr_service(0);
 
     // Init all buttons
