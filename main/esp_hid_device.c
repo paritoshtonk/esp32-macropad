@@ -26,6 +26,7 @@
 #include "esp_hidd.h"
 #include "esp_hid_gap.h"
 #include "store/config/ble_store_config.h"
+#include "global.h"
 
 static const char *TAG = "HID_DEV_DEMO";
 
@@ -543,6 +544,26 @@ void ble_hid_device_host_task(void *param)
     nimble_port_freertos_deinit();
 }
 
+// === Consumer task ===
+void button_event_handler_task(void *arg)
+{
+    button_event_t evt;
+    while (1)
+    {
+        if (xQueueReceive(button_queue, &evt, portMAX_DELAY))
+        {
+            if (evt.long_press)
+            {
+                ESP_LOGI(TAG, "Long press on '%c'", evt.id_char);
+            }
+            else
+            {
+                ESP_LOGI(TAG, "Short press on '%c'", evt.id_char);
+            }
+        }
+    }
+}
+
 void ble_store_config_init(void);
 
 void esp_hid_device_main(void)
@@ -576,4 +597,6 @@ void esp_hid_device_main(void)
     {
         ESP_LOGE(TAG, "esp_nimble_enable failed: %d", ret);
     }
+
+    xTaskCreate(button_event_handler_task, "button_evt_handler", 2048, NULL, 10, NULL);
 }
