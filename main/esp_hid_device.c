@@ -150,41 +150,42 @@ const unsigned char keyboardReportMap[] = {
     0x81, 0x00, //   Input (Data, Array) ; Keycodes
     0xC0,       // End Collection
 
-    // -------------------------------------------------
-    // Extended Mouse (Report ID 2)
-    0x05, 0x01, // Usage Page (Generic Desktop)
-    0x09, 0x02, // Usage (Mouse)
-    0xA1, 0x01, // Collection (Application)
-    0x85, 0x02, //   Report ID (2)
-    0x09, 0x01, //   Usage (Pointer)
-    0xA1, 0x00, //   Collection (Physical)
-    0x05, 0x09, //     Usage Page (Button)
-    0x19, 0x01, //     Usage Minimum (Button 1)
-    0x29, 0x05, //     Usage Maximum (Button 5)
-    0x15, 0x00,
-    0x25, 0x01,
-    0x95, 0x05,
-    0x75, 0x01,
-    0x81, 0x02, //     Input (Data, Variable, Absolute) ; Buttons
-    0x95, 0x01,
-    0x75, 0x03,
-    0x81, 0x01, //     Input (Constant) ; Padding
-    0x05, 0x01,
-    0x09, 0x30, //     Usage (X)
-    0x09, 0x31, //     Usage (Y)
-    0x09, 0x38, //     Usage (Wheel)
-    0x0C, 0x38, //     Usage (AC Pan) ; Horizontal scroll (using Consumer Page)
-    0x15, 0x81,
-    0x25, 0x7F,
-    0x75, 0x08,
-    0x95, 0x04,
-    0x81, 0x06, //     Input (Data, Variable, Relative)
-    0xC0,       //   End Collection
-    0xC0,       // End Collection
+    0x05, 0x01, // USAGE_PAGE (Generic Desktop)
+    0x09, 0x02, // USAGE (Mouse)
+    0xa1, 0x01, // COLLECTION (Application)
+
+    0x09, 0x01, //   USAGE (Pointer)
+    0xa1, 0x00, //   COLLECTION (Physical)
+
+    0x05, 0x09, //     USAGE_PAGE (Button)
+    0x19, 0x01, //     USAGE_MINIMUM (Button 1)
+    0x29, 0x03, //     USAGE_MAXIMUM (Button 3)
+    0x15, 0x00, //     LOGICAL_MINIMUM (0)
+    0x25, 0x01, //     LOGICAL_MAXIMUM (1)
+    0x95, 0x03, //     REPORT_COUNT (3)
+    0x75, 0x01, //     REPORT_SIZE (1)
+    0x81, 0x02, //     INPUT (Data,Var,Abs)
+    0x95, 0x01, //     REPORT_COUNT (1)
+    0x75, 0x05, //     REPORT_SIZE (5)
+    0x81, 0x03, //     INPUT (Cnst,Var,Abs)
+
+    0x05, 0x01, //     USAGE_PAGE (Generic Desktop)
+    0x09, 0x30, //     USAGE (X)
+    0x09, 0x31, //     USAGE (Y)
+    0x09, 0x38, //     USAGE (Wheel)
+    0x15, 0x81, //     LOGICAL_MINIMUM (-127)
+    0x25, 0x7f, //     LOGICAL_MAXIMUM (127)
+    0x75, 0x08, //     REPORT_SIZE (8)
+    0x95, 0x03, //     REPORT_COUNT (3)
+    0x81, 0x06, //     INPUT (Data,Var,Rel)
+
+    0xc0, //   END_COLLECTION
+    0xc0, // END_COLLECTION
 
     // -------------------------------------------------
     // Media Control (Report ID 3) — as provided
-    0x05, 0x0C, // Usage Page (Consumer)
+    0x05,
+    0x0C,       // Usage Page (Consumer)
     0x09, 0x01, // Usage (Consumer Control)
     0xA1, 0x01, // Collection (Application)
     0x85, 0x03, //   Report ID (3)
@@ -286,7 +287,7 @@ static void char_to_code(uint8_t *buffer, char ch)
             CASE('|', USB_HID_MODIFIER_LEFT_SHIFT, USB_HID_BSLASH);
             CASE(',', 0, USB_HID_COMMA);
             CASE('<', USB_HID_MODIFIER_LEFT_SHIFT, USB_HID_COMMA);
-            CASE('>', USB_HID_MODIFIER_LEFT_SHIFT, USB_HID_COMMA);
+            CASE('>', USB_HID_MODIFIER_LEFT_SHIFT, USB_HID_DOT);
             CASE('@', USB_HID_MODIFIER_LEFT_SHIFT, 31);
             CASE('!', USB_HID_MODIFIER_LEFT_SHIFT, 30);
             CASE('#', USB_HID_MODIFIER_LEFT_SHIFT, 32);
@@ -646,14 +647,13 @@ void button_event_handler_task(void *arg)
             }
             if (evt.long_press)
             {
-                type_string("long_press");
+                type_string("Long Press!@#$%^&*()_+{}[]:;'\",.<>/?\n");
                 send_consumer_value(HID_CONSUMER_VOLUME_DOWN);
                 ESP_LOGI(TAG, "Long press on '%c'", evt.id_char);
             }
             else
             {
-                type_string("short_press");
-                send_consumer_value(HID_CONSUMER_VOLUME_UP);
+                send_mouse(1, 20, 20, 0);
                 ESP_LOGI(TAG, "Short press on '%c'", evt.id_char);
             }
         }
